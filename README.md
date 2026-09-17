@@ -29,6 +29,7 @@ Students can register, log in, and manage their own tasks — create, edit, dele
 
 **Frontend:** React.js, Vite, JavaScript, Axios, React Router
 **Backend:** Node.js, Express.js
+**Validation:** Zod (backend request validation)
 **Database:** MongoDB with Mongoose
 **Auth:** JWT + bcryptjs + HTTP-only cookies
 **Other:** dotenv, cors, helmet, cookie-parser
@@ -37,7 +38,7 @@ Students can register, log in, and manage their own tasks — create, edit, dele
 
 ## 4. Architecture
 
-````
+```
 React (Vite)
    ↓
 Axios (withCredentials: true)
@@ -46,12 +47,14 @@ Express REST API
    ↓
 Authentication Middleware (verifies JWT cookie)
    ↓
+Zod Validation Middleware (validates req.body)
+   ↓
 Controller (business logic)
    ↓
 Mongoose
    ↓
 MongoDB
-
+```
 
 ---
 
@@ -84,7 +87,80 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 ---
 
-## 7. Database Schema
+## 7. Request Validation (Zod)
+
+Backend request bodies are validated with [Zod](https://zod.dev) before they reach any controller.
+
+```
+backend/
+├── validations/
+│   ├── authValidation.js   # registerSchema, loginSchema
+│   └── taskValidation.js   # createTaskSchema, updateTaskSchema
+└── middleware/
+    └── validate.js         # reusable middleware: validate(schema)
+```
+
+`validate.js` is a small factory function — it takes a Zod schema, runs `schema.safeParse(req.body)`, and either calls `next()` with the parsed data or responds with `400` and a list of field errors:
+
+```js
+const validate = (schema) => (req, res, next) => {
+  const result = schema.safeParse(req.body);
+  if (!result.success) {
+    const errors = result.error.issues.map((issue) => ({
+      field: issue.path.join("."),
+      message: issue.message,
+    }));
+    return res.status(400).json({ message: "Validation failed", errors });
+  }
+  req.body = result.data;
+  next();
+};
+```
+
+It's applied directly in the route definitions:
+
+```js
+router.post("/register", validate(registerSchema), register);
+router.post("/login", validate(loginSchema), login);
+
+router.route("/").post(validate(createTaskSchema), createTask);
+router.route("/:id").put(validate(updateTaskSchema), updateTask);
+```
+
+**Responsibility split** stays clean:
+- **Zod** — validates shape/format of incoming request data.
+- **Auth middleware** — checks whether the user is logged in.
+- **Controller** — application logic only (no manual `if (!title)` checks anymore).
+- **Mongoose** — schema-level database validation (a second safety net).
+
+`updateTaskSchema` is `createTaskSchema.partial()` — since a `PUT` may only send one changed field (e.g. `{ completed: true }` when toggling a task), every field is optional on update but still type/format-checked when present.
+
+Example invalid request:
+
+```bash
+curl -X POST http://localhost:5000/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"","priority":"Urgent","dueDate":"not-a-date"}'
+```
+
+Response (`400 Bad Request`):
+
+```json
+{
+  "message": "Validation failed",
+  "errors": [
+    { "field": "title", "message": "Title is required" },
+    { "field": "priority", "message": "Priority must be Low, Medium, or High" },
+    { "field": "dueDate", "message": "Due date must be a valid date" }
+  ]
+}
+```
+
+The frontend's `getErrorMessage()` helper (`frontend/src/services/api.js`) reads `err.response.data.errors` and joins the messages into one readable string shown in the form's error banner — no stack traces or internal details ever reach the UI.
+
+---
+
+## 8. Database Schema
 
 **User**
 | Field | Type | Notes |
@@ -107,7 +183,7 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 ---
 
-## 8. API Endpoints
+## 9. API Endpoints
 
 **Auth**
 | Method | Route | Description | Protected |
@@ -128,7 +204,7 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 ---
 
-## 9. Local Setup
+## 10. Local Setup
 
 ### Prerequisites
 - Node.js (v18+)
@@ -182,7 +258,7 @@ Open `http://localhost:5173`, register a new account, and start managing tasks.
 
 ---
 
-## 10. MongoDB Atlas Setup
+## 11. MongoDB Atlas Setup
 
 1. Create a free account at mongodb.com/cloud/atlas.
 2. Create a new free-tier cluster.
@@ -193,11 +269,11 @@ Open `http://localhost:5173`, register a new account, and start managing tasks.
 
 ---
 
-## 11. Screenshots
+## 12. Screenshots
 
 ---
 
-## 12. Future Improvements
+## 13. Future Improvements
 
 - Pagination for large task lists
 - Task categories/tags
@@ -207,7 +283,7 @@ Open `http://localhost:5173`, register a new account, and start managing tasks.
 
 ---
 
-## 13. Testing Checklist
+## 14. Testing Checklist
 
 **Authentication**
 
@@ -261,3 +337,15 @@ Open `http://localhost:5173`, register a new account, and start managing tasks.
 - [x] CORS restricted to `CLIENT_URL` with credentials
 - [x] Secrets in environment variables
 - [x] `.env` files ignored by Git
+
+**Zod Validation** (tested live against a running server + MongoDB Atlas)
+
+- [x] Invalid registration (short name, bad email, short password) → `400` with field errors
+- [x] Invalid login (missing password, bad email format) → `400` with field errors
+- [x] Empty/whitespace-only task title → `400`, "Title is required"
+- [x] Invalid priority value → `400`, "Priority must be Low, Medium, or High"
+- [x] Invalid due date → `400`, "Due date must be a valid date"
+- [x] Invalid `completed` value (non-boolean) → `400`
+- [x] Valid task creation → `201`, task saved
+- [x] Valid partial task update (e.g. `{ completed: true }` only) → `200`, task updated
+- [x] Existing functionality (search, filters, delete, logout, 401 after logout) still works unchanged

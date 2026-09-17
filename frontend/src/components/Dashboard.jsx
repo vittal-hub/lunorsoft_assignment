@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { createTask, deleteTask, getTasks, updateTask } from "../services/taskService";
+import { getErrorMessage } from "../services/api";
 import TaskForm from "./TaskForm";
 import TaskList from "./TaskList";
 import FilterBar from "./FilterBar";
@@ -57,7 +58,7 @@ const Dashboard = () => {
       setShowForm(false);
       fetchTasks();
     } catch (err) {
-      setError(err.response?.data?.message || "Task could not be saved");
+      setError(getErrorMessage(err, "Task could not be saved"));
     }
   };
 
