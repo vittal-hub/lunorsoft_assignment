@@ -31,7 +31,7 @@ exports.register = async (req, res) => {
 
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
-      return res.status(400).json({ message: "Email is already registered" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -48,7 +48,9 @@ exports.register = async (req, res) => {
     if (error.name === "ValidationError") {
       return res.status(400).json({ message: error.message });
     }
-    res.status(500).json({ message: "Something went wrong. Please try again." });
+    res
+      .status(500)
+      .json({ message: "Something went wrong. Please try again." });
   }
 };
 
@@ -73,7 +75,9 @@ exports.login = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email },
     });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong. Please try again." });
+    res
+      .status(500)
+      .json({ message: "Something went wrong. Please try again." });
   }
 };
 
@@ -92,6 +96,8 @@ exports.getMe = async (req, res) => {
     }
     res.status(200).json({ user });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong. Please try again." });
+    res
+      .status(500)
+      .json({ message: "Something went wrong. Please try again." });
   }
 };

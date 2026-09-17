@@ -88,6 +88,19 @@ const aboutFeatures = [
   { icon: "🔐", title: "Secure Authentication", text: "Your account and tasks are kept private and secure." },
 ];
 
+// Shared feature-card grid, reused by both the public and logged-in Home views
+const FeaturesGrid = ({ items }) => (
+  <div className="landing-features">
+    {items.map((feature) => (
+      <div className="landing-feature-card" key={feature.title}>
+        <div className="landing-feature-emoji">{feature.icon}</div>
+        <h3>{feature.title}</h3>
+        <p>{feature.text}</p>
+      </div>
+    ))}
+  </div>
+);
+
 const LoggedInHome = () => (
   <div className="landing">
     <header className="landing-hero">
@@ -100,15 +113,7 @@ const LoggedInHome = () => (
 
     <section className="landing-section">
       <h2>Features</h2>
-      <div className="landing-features">
-        {aboutFeatures.map((feature) => (
-          <div className="landing-feature-card" key={feature.title}>
-            <div className="landing-feature-emoji">{feature.icon}</div>
-            <h3>{feature.title}</h3>
-            <p>{feature.text}</p>
-          </div>
-        ))}
-      </div>
+      <FeaturesGrid items={aboutFeatures} />
     </section>
 
     <footer className="landing-footer">
@@ -187,6 +192,11 @@ const Landing = () => {
         <Link to="/register" className="btn-link btn-primary-link">
           Get Started
         </Link>
+      </section>
+
+      <section className="landing-section">
+        <h2>Features</h2>
+        <FeaturesGrid items={aboutFeatures} />
       </section>
 
       <footer className="landing-footer">

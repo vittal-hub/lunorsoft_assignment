@@ -5,25 +5,38 @@ const emptyForm = { title: "", description: "", subject: "Other", priority: "Med
 
 const TaskForm = ({ onSubmit, editingTask, onCancel, saving }) => {
   const [form, setForm] = useState(emptyForm);
+  const [customSubject, setCustomSubject] = useState("");
   const [error, setError] = useState("");
 
   // Load existing task data into the form when editing
   useEffect(() => {
     if (editingTask) {
+      const isCustomSubject = editingTask.subject && !SUBJECTS.includes(editingTask.subject);
       setForm({
         title: editingTask.title,
         description: editingTask.description || "",
-        subject: editingTask.subject || "Other",
+        subject: isCustomSubject ? "Other" : editingTask.subject || "Other",
         priority: editingTask.priority,
         dueDate: editingTask.dueDate ? editingTask.dueDate.slice(0, 10) : "",
       });
+      setCustomSubject(isCustomSubject ? editingTask.subject : "");
     } else {
       setForm(emptyForm);
+      setCustomSubject("");
     }
   }, [editingTask]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Hide and clear the custom subject field whenever a predefined subject is chosen again
+  const handleSubjectChange = (e) => {
+    const value = e.target.value;
+    setForm({ ...form, subject: value });
+    if (value !== "Other") {
+      setCustomSubject("");
+    }
   };
 
   const handleSubmit = (e) => {
@@ -32,6 +45,14 @@ const TaskForm = ({ onSubmit, editingTask, onCancel, saving }) => {
 
     if (!form.title.trim()) {
       setError("Title is required");
+      return;
+    }
+    if (!form.subject) {
+      setError("Subject is required");
+      return;
+    }
+    if (form.subject === "Other" && !customSubject.trim()) {
+      setError("Please enter a custom subject");
       return;
     }
     if (!form.priority) {
@@ -43,12 +64,16 @@ const TaskForm = ({ onSubmit, editingTask, onCancel, saving }) => {
       return;
     }
 
-    onSubmit(form);
+    const subject = form.subject === "Other" ? customSubject.trim() : form.subject;
+    onSubmit({ ...form, subject });
     setForm(emptyForm);
+    setCustomSubject("");
   };
 
   return (
     <form className="task-form" onSubmit={handleSubmit}>
+      <h2 className="task-form-heading">{editingTask ? "Update Task" : "Create Task"}</h2>
+
       {error && <p className="error-message">{error}</p>}
 
       <label>Title</label>
@@ -65,13 +90,25 @@ const TaskForm = ({ onSubmit, editingTask, onCancel, saving }) => {
       <div className="task-form-row">
         <div className="task-form-field">
           <label>Subject</label>
-          <select name="subject" value={form.subject} onChange={handleChange}>
+          <select name="subject" value={form.subject} onChange={handleSubjectChange}>
             {SUBJECTS.map((s) => (
               <option key={s} value={s}>
                 {s}
               </option>
             ))}
           </select>
+
+          {form.subject === "Other" && (
+            <>
+              <label>Other Subject</label>
+              <input
+                name="customSubject"
+                value={customSubject}
+                onChange={(e) => setCustomSubject(e.target.value)}
+                placeholder="Enter subject name"
+              />
+            </>
+          )}
         </div>
 
         <div className="task-form-field">

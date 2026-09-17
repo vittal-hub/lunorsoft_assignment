@@ -1,12 +1,17 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useTasks } from "../hooks/useTasks";
-import { updateTask } from "../services/taskService";
+import { updateTask, deleteTask } from "../services/taskService";
 import { getGreeting, isDueToday, calculateStreak } from "../utils/dashboard";
+import { getSmartFocusTask, formatDueLabel } from "../utils/smartFocus";
+import TaskOverview from "./TaskOverview";
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { tasks, loading, error, refetch } = useTasks();
+  const [viewingTask, setViewingTask] = useState(null);
 
   const totalTasks = tasks.length;
   const pendingTasks = tasks.filter((t) => !t.completed).length;
@@ -17,14 +22,31 @@ const Dashboard = () => {
   const todayCompleted = todayTasks.filter((t) => t.completed).length;
 
   const streak = calculateStreak(tasks);
+  const smartFocus = getSmartFocusTask(tasks);
 
   const handleToggleComplete = async (task) => {
     try {
       await updateTask(task._id, { completed: !task.completed });
+      setViewingTask(null);
       refetch();
     } catch (err) {
       // Dashboard toggle is a quick action; full error handling lives on the Tasks page
     }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteTask(id);
+      setViewingTask(null);
+      refetch();
+    } catch (err) {
+      // Dashboard delete is a quick action; full error handling lives on the Tasks page
+    }
+  };
+
+  const handleEdit = () => {
+    setViewingTask(null);
+    navigate("/tasks");
   };
 
   return (
@@ -78,6 +100,42 @@ const Dashboard = () => {
         </div>
       </section>
 
+      <section className="smart-focus-card">
+        <div className="smart-focus-header">
+          <span className="smart-focus-icon" aria-hidden="true">
+            🎯
+          </span>
+          <div>
+            <h2 className="section-title">Smart Focus</h2>
+            <p className="smart-focus-subtitle">What should I work on next?</p>
+          </div>
+        </div>
+
+        {smartFocus ? (
+          <div className="smart-focus-body">
+            <div className="smart-focus-info">
+              <h3 className="smart-focus-title">{smartFocus.task.title}</h3>
+              <div className="task-tags">
+                {smartFocus.task.subject && (
+                  <span className="subject-tag">{smartFocus.task.subject}</span>
+                )}
+                <span className={`priority-tag priority-${smartFocus.task.priority.toLowerCase()}`}>
+                  {smartFocus.task.priority}
+                </span>
+              </div>
+              <p className="smart-focus-due">📅 Due: {formatDueLabel(smartFocus.task.dueDate)}</p>
+              <p className="smart-focus-status">Status: Pending</p>
+              <p className="smart-focus-reason">{smartFocus.reason}</p>
+            </div>
+            <button className="smart-focus-start" onClick={() => setViewingTask(smartFocus.task)}>
+              Start Task →
+            </button>
+          </div>
+        ) : (
+          <p className="smart-focus-empty">🎉 You're all caught up!</p>
+        )}
+      </section>
+
       <section className="task-management">
         <div className="task-management-header">
           <h2 className="section-title">Today's Tasks</h2>
@@ -112,6 +170,14 @@ const Dashboard = () => {
           </>
         )}
       </section>
+
+      <TaskOverview
+        task={viewingTask}
+        onClose={() => setViewingTask(null)}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+        onToggleComplete={handleToggleComplete}
+      />
     </div>
   );
 };

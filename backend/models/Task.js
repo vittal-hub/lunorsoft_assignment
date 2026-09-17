@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { SUBJECTS } = require("../constants");
 
 const taskSchema = new mongoose.Schema({
   title: {
@@ -12,9 +11,12 @@ const taskSchema = new mongoose.Schema({
     trim: true,
     default: "",
   },
+  // Free text so a custom subject (from the "Other" option) can be stored,
+  // not just the predefined dropdown values
   subject: {
     type: String,
-    enum: SUBJECTS,
+    trim: true,
+    required: [true, "Subject is required"],
     default: "Other",
   },
   priority: {
