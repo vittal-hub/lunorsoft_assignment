@@ -1,3 +1,10 @@
+const CalendarIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="icon-calendar">
+    <rect x="3" y="5" width="18" height="16" rx="2" />
+    <path d="M3 10h18M8 3v4M16 3v4" strokeLinecap="round" />
+  </svg>
+);
+
 const TaskCard = ({ task, onEdit, onDelete, onToggleComplete, onView, readOnly }) => {
   const isOverdue = !task.completed && new Date(task.dueDate) < new Date().setHours(0, 0, 0, 0);
 
@@ -9,7 +16,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete, onView, readOnly }
 
   return (
     <div
-      className={`task-card priority-${task.priority.toLowerCase()} ${onView ? "task-card-clickable" : ""}`}
+      className={`task-card ${onView ? "task-card-clickable" : ""}`}
       onClick={onView ? () => onView(task) : undefined}
     >
       <div className="task-card-header">
@@ -19,29 +26,38 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete, onView, readOnly }
         </span>
       </div>
 
-      {task.subject && <span className="subject-tag">{task.subject}</span>}
-
-      {task.description && <p className="task-description">{task.description}</p>}
-
-      <div className="task-meta">
+      <div className="task-tags">
+        {task.subject && <span className="subject-tag">{task.subject}</span>}
         <span className={`priority-tag priority-${task.priority.toLowerCase()}`}>
           {task.priority}
         </span>
-        <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
-        {isOverdue && <span className="overdue-tag">Overdue</span>}
       </div>
 
-      {!readOnly && (
-        <div className="task-actions">
-          <button onClick={stopAndRun(() => onToggleComplete(task))}>
-            {task.completed ? "Mark Pending" : "Mark Complete"}
-          </button>
-          <button onClick={stopAndRun(() => onEdit(task))}>Edit</button>
-          <button className="btn-danger" onClick={stopAndRun(() => onDelete(task._id))}>
-            Delete
-          </button>
+      {task.description && <p className="task-description">{task.description}</p>}
+
+      <div className="task-card-footer">
+        <div className="task-meta">
+          <span className="task-due-date">
+            <CalendarIcon />
+            Due {new Date(task.dueDate).toLocaleDateString()}
+          </span>
+          {isOverdue && <span className="overdue-tag">Overdue</span>}
         </div>
-      )}
+
+        {!readOnly && (
+          <div className="task-actions">
+            <button onClick={stopAndRun(() => onToggleComplete(task))}>
+              {task.completed ? "Mark Pending" : "Mark Complete"}
+            </button>
+            <button className="btn-secondary" onClick={stopAndRun(() => onEdit(task))}>
+              Edit
+            </button>
+            <button className="btn-danger" onClick={stopAndRun(() => onDelete(task._id))}>
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
