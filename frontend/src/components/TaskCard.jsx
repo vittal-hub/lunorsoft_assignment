@@ -1,4 +1,4 @@
-const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
+const TaskCard = ({ task, onEdit, onDelete, onToggleComplete, readOnly }) => {
   const isOverdue = !task.completed && new Date(task.dueDate) < new Date().setHours(0, 0, 0, 0);
 
   return (
@@ -20,15 +20,17 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete }) => {
         {isOverdue && <span className="overdue-tag">Overdue</span>}
       </div>
 
-      <div className="task-actions">
-        <button onClick={() => onToggleComplete(task)}>
-          {task.completed ? "Mark Pending" : "Mark Complete"}
-        </button>
-        <button onClick={() => onEdit(task)}>Edit</button>
-        <button className="btn-danger" onClick={() => onDelete(task._id)}>
-          Delete
-        </button>
-      </div>
+      {!readOnly && (
+        <div className="task-actions">
+          <button onClick={() => onToggleComplete(task)}>
+            {task.completed ? "Mark Pending" : "Mark Complete"}
+          </button>
+          <button onClick={() => onEdit(task)}>Edit</button>
+          <button className="btn-danger" onClick={() => onDelete(task._id)}>
+            Delete
+          </button>
+        </div>
+      )}
     </div>
   );
 };

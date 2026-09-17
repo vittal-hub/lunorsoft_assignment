@@ -12,9 +12,13 @@ const app = express();
 connectDB();
 
 app.use(helmet());
+
+// Remove a trailing slash so the allowed origin exactly matches the browser's Origin header
+const clientUrl = process.env.CLIENT_URL?.replace(/\/$/, "");
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: clientUrl,
     credentials: true,
   })
 );

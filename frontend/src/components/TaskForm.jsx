@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const emptyForm = { title: "", description: "", priority: "Medium", dueDate: "" };
 
-const TaskForm = ({ onSubmit, editingTask, onCancel }) => {
+const TaskForm = ({ onSubmit, editingTask, onCancel, saving }) => {
   const [form, setForm] = useState(emptyForm);
   const [error, setError] = useState("");
 
@@ -71,9 +71,17 @@ const TaskForm = ({ onSubmit, editingTask, onCancel }) => {
       <input type="date" name="dueDate" value={form.dueDate} onChange={handleChange} />
 
       <div className="task-form-buttons">
-        <button type="submit">{editingTask ? "Update Task" : "Add Task"}</button>
+        <button type="submit" disabled={saving}>
+          {saving
+            ? editingTask
+              ? "Updating task..."
+              : "Creating task..."
+            : editingTask
+            ? "Update Task"
+            : "Add Task"}
+        </button>
         {editingTask && (
-          <button type="button" className="btn-secondary" onClick={onCancel}>
+          <button type="button" className="btn-secondary" onClick={onCancel} disabled={saving}>
             Cancel
           </button>
         )}

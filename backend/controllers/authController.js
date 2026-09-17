@@ -2,6 +2,16 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
+// Frontend (Netlify) and backend (Render) are on different domains, so the
+// cookie needs SameSite=None to be sent on cross-site requests. SameSite=None
+// requires Secure, which only works over HTTPS (i.e. in production).
+const isProduction = process.env.NODE_ENV === "production";
+const cookieOptions = {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+};
+
 // Create JWT and set it as an HTTP-only cookie
 const sendTokenCookie = (res, userId) => {
   const token = jwt.sign({ id: userId }, process.env.JWT_SECRET, {
@@ -9,9 +19,7 @@ const sendTokenCookie = (res, userId) => {
   });
 
   res.cookie("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    ...cookieOptions,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
@@ -71,11 +79,7 @@ exports.login = async (req, res) => {
 
 // Logout user
 exports.logout = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-  });
+  res.clearCookie("token", cookieOptions);
   res.status(200).json({ message: "Logged out successfully" });
 };
 

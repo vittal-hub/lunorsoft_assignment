@@ -1,115 +1,27 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { createTask, deleteTask, getTasks, updateTask } from "../services/taskService";
-import { getErrorMessage } from "../services/api";
-import TaskForm from "./TaskForm";
+import { useTasks } from "../hooks/useTasks";
 import TaskList from "./TaskList";
-import FilterBar from "./FilterBar";
+
+const RECENT_TASKS_COUNT = 5;
 
 const Dashboard = () => {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { tasks, loading, error } = useTasks();
 
-  const [tasks, setTasks] = useState([]);
-  const [allTasks, setAllTasks] = useState([]);
-  const [editingTask, setEditingTask] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [error, setError] = useState("");
-
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("All");
-  const [priority, setPriority] = useState("All");
-
-  const fetchTasks = async () => {
-    try {
-      const params = {};
-      if (search) params.search = search;
-      if (status !== "All") params.status = status;
-      if (priority !== "All") params.priority = priority;
-
-      const res = await getTasks(params);
-      setTasks(res.data.tasks);
-
-      // Unfiltered list, used only for dashboard statistics
-      const allRes = await getTasks({});
-      setAllTasks(allRes.data.tasks);
-    } catch (err) {
-      setError("Something went wrong. Please try again.");
-    }
-  };
-
-  // Refetch tasks whenever search or filters change
-  useEffect(() => {
-    const timer = setTimeout(fetchTasks, 300);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, status, priority]);
-
-  const handleAddOrUpdate = async (formData) => {
-    setError("");
-    try {
-      if (editingTask) {
-        await updateTask(editingTask._id, formData);
-      } else {
-        await createTask(formData);
-      }
-      setEditingTask(null);
-      setShowForm(false);
-      fetchTasks();
-    } catch (err) {
-      setError(getErrorMessage(err, "Task could not be saved"));
-    }
-  };
-
-  const handleEdit = (task) => {
-    setEditingTask(task);
-    setShowForm(true);
-  };
-
-  const handleCancel = () => {
-    setEditingTask(null);
-    setShowForm(false);
-  };
-
-  const handleDelete = async (id) => {
-    setError("");
-    try {
-      await deleteTask(id);
-      fetchTasks();
-    } catch (err) {
-      setError("Task could not be deleted");
-    }
-  };
-
-  const handleToggleComplete = async (task) => {
-    setError("");
-    try {
-      await updateTask(task._id, { completed: !task.completed });
-      fetchTasks();
-    } catch (err) {
-      setError("Task could not be updated");
-    }
-  };
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
-
-  const totalTasks = allTasks.length;
-  const pendingTasks = allTasks.filter((t) => !t.completed).length;
-  const completedTasks = allTasks.filter((t) => t.completed).length;
+  const totalTasks = tasks.length;
+  const pendingTasks = tasks.filter((t) => !t.completed).length;
+  const completedTasks = tasks.filter((t) => t.completed).length;
+  const recentTasks = tasks.slice(0, RECENT_TASKS_COUNT);
 
   return (
-    <div className="dashboard">
-      <header className="dashboard-header">
-        <h1>Student Task Manager</h1>
-        <div className="header-right">
-          <span>Hi, {user?.name}</span>
-          <button onClick={handleLogout}>Logout</button>
-        </div>
-      </header>
+    <div className="page-container">
+      <div className="dashboard-welcome">
+        <h1 className="page-title">Welcome back, {user?.name}</h1>
+        <Link to="/tasks" className="btn-link btn-primary-link">
+          + Add Task
+        </Link>
+      </div>
 
       {error && <p className="error-message">{error}</p>}
 
@@ -130,27 +42,17 @@ const Dashboard = () => {
 
       <section className="task-management">
         <div className="task-management-header">
-          <FilterBar
-            search={search}
-            setSearch={setSearch}
-            status={status}
-            setStatus={setStatus}
-            priority={priority}
-            setPriority={setPriority}
-          />
-          {!showForm && <button onClick={() => setShowForm(true)}>Add Task</button>}
+          <h2 className="section-title">Recent Tasks</h2>
+          <Link to="/tasks" className="btn-link">
+            View All Tasks
+          </Link>
         </div>
 
-        {showForm && (
-          <TaskForm onSubmit={handleAddOrUpdate} editingTask={editingTask} onCancel={handleCancel} />
+        {loading ? (
+          <p className="loading-text">Loading dashboard...</p>
+        ) : (
+          <TaskList tasks={recentTasks} readOnly />
         )}
-
-        <TaskList
-          tasks={tasks}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onToggleComplete={handleToggleComplete}
-        />
       </section>
     </div>
   );

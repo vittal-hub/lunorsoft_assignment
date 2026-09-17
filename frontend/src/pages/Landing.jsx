@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 
 const features = [
   {
@@ -111,30 +110,8 @@ const steps = [
 ];
 
 const Landing = () => {
-  const { user } = useAuth();
-
   return (
     <div className="landing">
-      <nav className="landing-navbar">
-        <span className="landing-logo">Task Manager</span>
-        <div className="landing-navbar-links">
-          {user ? (
-            <Link to="/dashboard" className="btn-link btn-primary-link">
-              Dashboard
-            </Link>
-          ) : (
-            <>
-              <Link to="/login" className="btn-link">
-                Login
-              </Link>
-              <Link to="/register" className="btn-link btn-primary-link">
-                Sign Up
-              </Link>
-            </>
-          )}
-        </div>
-      </nav>
-
       <header className="landing-hero">
         <h1>Manage Your Tasks. Stay Organized.</h1>
         <p>

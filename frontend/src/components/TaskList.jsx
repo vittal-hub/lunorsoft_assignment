@@ -1,8 +1,12 @@
 import TaskCard from "./TaskCard";
 
-const TaskList = ({ tasks, onEdit, onDelete, onToggleComplete }) => {
+const TaskList = ({ tasks, onEdit, onDelete, onToggleComplete, hasFilters, readOnly }) => {
   if (tasks.length === 0) {
-    return <p className="empty-state">No tasks found.</p>;
+    return (
+      <p className="empty-state">
+        {hasFilters ? "No tasks found." : "No tasks yet. Create your first task to get started."}
+      </p>
+    );
   }
 
   return (
@@ -14,6 +18,7 @@ const TaskList = ({ tasks, onEdit, onDelete, onToggleComplete }) => {
           onEdit={onEdit}
           onDelete={onDelete}
           onToggleComplete={onToggleComplete}
+          readOnly={readOnly}
         />
       ))}
     </div>
