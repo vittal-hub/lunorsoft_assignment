@@ -37,7 +37,7 @@ Students can register, log in, and manage their own tasks — create, edit, dele
 
 ## 4. Architecture
 
-```
+````
 React (Vite)
    ↓
 Axios (withCredentials: true)
@@ -55,64 +55,7 @@ MongoDB
 
 ---
 
-## 5. Folder Structure
-
-```
-
-lunorsoft_assignment/
-├── backend/
-│ ├── config/
-│ │ └── db.js
-│ ├── controllers/
-│ │ ├── authController.js
-│ │ └── taskController.js
-│ ├── middleware/
-│ │ └── authMiddleware.js
-│ ├── models/
-│ │ ├── User.js
-│ │ └── Task.js
-│ ├── routes/
-│ │ ├── authRoutes.js
-│ │ └── taskRoutes.js
-│ ├── .env
-│ ├── .env.example
-│ ├── .gitignore
-│ ├── package.json
-│ └── server.js
-│
-└── frontend/
-├── src/
-│ ├── components/
-│ │ ├── Dashboard.jsx
-│ │ ├── TaskForm.jsx
-│ │ ├── TaskCard.jsx
-│ │ ├── TaskList.jsx
-│ │ ├── FilterBar.jsx
-│ │ └── ProtectedRoute.jsx
-│ ├── pages/
-│ │ ├── Login.jsx
-│ │ └── Register.jsx
-│ ├── services/
-│ │ ├── api.js
-│ │ ├── authService.js
-│ │ └── taskService.js
-│ ├── context/
-│ │ └── AuthContext.jsx
-│ ├── App.jsx
-│ ├── App.css
-│ └── main.jsx
-├── .env
-├── .env.example
-├── .gitignore
-├── index.html
-├── package.json
-└── vite.config.js
-
-````
-
----
-
-## 6. Authentication Flow
+## 5. Authentication Flow
 
 1. User registers or logs in with email + password.
 2. Backend hashes the password with bcryptjs (registration) or compares it with bcryptjs (login).
@@ -126,7 +69,7 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 ---
 
-## 7. Security Measures
+## 6. Security Measures
 
 - **Password hashing:** bcryptjs with a salt, never plain text.
 - **JWT auth:** short-lived, signed with a secret from `.env`.
@@ -141,11 +84,11 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 ---
 
-## 8. Database Schema
+## 7. Database Schema
 
 **User**
 | Field | Type | Notes |
-|---|---|---|
+
 | name | String | required |
 | email | String | required, unique, validated format |
 | password | String | required, hashed, min 6 chars |
@@ -153,7 +96,7 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 **Task**
 | Field | Type | Notes |
-|---|---|---|
+
 | title | String | required |
 | description | String | optional |
 | priority | String | enum: Low / Medium / High |
@@ -164,11 +107,11 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 ---
 
-## 9. API Endpoints
+## 8. API Endpoints
 
 **Auth**
 | Method | Route | Description | Protected |
-|---|---|---|---|
+
 | POST | /api/auth/register | Register a new user | No |
 | POST | /api/auth/login | Login, sets JWT cookie | No |
 | POST | /api/auth/logout | Clears JWT cookie | No |
@@ -176,7 +119,7 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 **Tasks**
 | Method | Route | Description | Protected |
-|---|---|---|---|
+
 | GET | /api/tasks | Get user's tasks (supports `?status=`, `?priority=`, `?search=`) | Yes |
 | GET | /api/tasks/:id | Get one task (only if owned by user) | Yes |
 | POST | /api/tasks | Create a task | Yes |
@@ -185,7 +128,7 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 ---
 
-## 10. Local Setup
+## 9. Local Setup
 
 ### Prerequisites
 - Node.js (v18+)
@@ -239,7 +182,7 @@ Open `http://localhost:5173`, register a new account, and start managing tasks.
 
 ---
 
-## 11. MongoDB Atlas Setup
+## 10. MongoDB Atlas Setup
 
 1. Create a free account at mongodb.com/cloud/atlas.
 2. Create a new free-tier cluster.
@@ -250,11 +193,11 @@ Open `http://localhost:5173`, register a new account, and start managing tasks.
 
 ---
 
-## 13. Screenshots
+## 11. Screenshots
 
 ---
 
-## 14. Future Improvements
+## 12. Future Improvements
 
 - Pagination for large task lists
 - Task categories/tags
@@ -264,7 +207,7 @@ Open `http://localhost:5173`, register a new account, and start managing tasks.
 
 ---
 
-## 15. Testing Checklist
+## 13. Testing Checklist
 
 **Authentication**
 
