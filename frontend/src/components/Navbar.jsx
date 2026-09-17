@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
+const navLinkClass = ({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`;
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -18,8 +20,18 @@ const Navbar = () => {
   return (
     <header className="navbar">
       <div className="navbar-inner">
-        <Link to="/" className="navbar-logo" onClick={closeMenu}>
-          Student Task Manager
+        <Link to={user ? "/dashboard" : "/"} className="navbar-logo" onClick={closeMenu}>
+          <svg
+            className="navbar-logo-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="5" />
+            <path d="m7.5 12.5 2.5 2.5 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          taskmangmt
         </Link>
 
         <button
@@ -33,18 +45,18 @@ const Navbar = () => {
         </button>
 
         <nav className={`navbar-links ${menuOpen ? "navbar-links-open" : ""}`}>
-          <Link to="/" onClick={closeMenu}>
+          <NavLink to="/" end className={navLinkClass} onClick={closeMenu}>
             Home
-          </Link>
+          </NavLink>
 
           {user && (
             <>
-              <Link to="/dashboard" onClick={closeMenu}>
+              <NavLink to="/dashboard" className={navLinkClass} onClick={closeMenu}>
                 Dashboard
-              </Link>
-              <Link to="/tasks" onClick={closeMenu}>
+              </NavLink>
+              <NavLink to="/tasks" className={navLinkClass} onClick={closeMenu}>
                 My Tasks
-              </Link>
+              </NavLink>
             </>
           )}
 

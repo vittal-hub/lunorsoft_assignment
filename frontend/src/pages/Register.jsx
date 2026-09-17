@@ -47,7 +47,7 @@ const Register = () => {
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
         <h1>Student Task Manager</h1>
-        <h2>Register</h2>
+        <h2>Create your account</h2>
 
         {error && <p className="error-message">{error}</p>}
 

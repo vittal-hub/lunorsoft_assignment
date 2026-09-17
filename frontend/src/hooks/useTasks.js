@@ -2,9 +2,9 @@ import { useCallback, useEffect, useState } from "react";
 import { getTasks } from "../services/taskService";
 import { getErrorMessage } from "../services/api";
 
-// Fetch the logged-in user's tasks, optionally filtered by status/priority/search
+// Fetch the logged-in user's tasks, optionally filtered by status/priority/subject/search
 export const useTasks = (filters = {}) => {
-  const { search = "", status = "All", priority = "All" } = filters;
+  const { search = "", status = "All", priority = "All", subject = "All" } = filters;
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -16,6 +16,7 @@ export const useTasks = (filters = {}) => {
       if (search) params.search = search;
       if (status !== "All") params.status = status;
       if (priority !== "All") params.priority = priority;
+      if (subject !== "All") params.subject = subject;
 
       const res = await getTasks(params);
       setTasks(res.data.tasks);
@@ -25,7 +26,7 @@ export const useTasks = (filters = {}) => {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, status, priority]);
+  }, [search, status, priority, subject]);
 
   useEffect(() => {
     setLoading(true);

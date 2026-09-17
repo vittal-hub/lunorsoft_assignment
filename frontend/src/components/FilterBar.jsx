@@ -1,4 +1,15 @@
-const FilterBar = ({ search, setSearch, status, setStatus, priority, setPriority }) => {
+import { SUBJECTS } from "../constants";
+
+const FilterBar = ({
+  search,
+  setSearch,
+  status,
+  setStatus,
+  priority,
+  setPriority,
+  subject,
+  setSubject,
+}) => {
   return (
     <div className="filter-bar">
       <input
@@ -12,6 +23,15 @@ const FilterBar = ({ search, setSearch, status, setStatus, priority, setPriority
         <option value="All">All Status</option>
         <option value="pending">Pending</option>
         <option value="completed">Completed</option>
+      </select>
+
+      <select value={subject} onChange={(e) => setSubject(e.target.value)}>
+        <option value="All">All Subjects</option>
+        {SUBJECTS.map((s) => (
+          <option key={s} value={s}>
+            {s}
+          </option>
+        ))}
       </select>
 
       <select value={priority} onChange={(e) => setPriority(e.target.value)}>

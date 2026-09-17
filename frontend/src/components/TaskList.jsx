@@ -1,6 +1,6 @@
 import TaskCard from "./TaskCard";
 
-const TaskList = ({ tasks, onEdit, onDelete, onToggleComplete, hasFilters, readOnly }) => {
+const TaskList = ({ tasks, onEdit, onDelete, onToggleComplete, onView, hasFilters, readOnly }) => {
   if (tasks.length === 0) {
     return (
       <p className="empty-state">
@@ -18,6 +18,7 @@ const TaskList = ({ tasks, onEdit, onDelete, onToggleComplete, hasFilters, readO
           onEdit={onEdit}
           onDelete={onDelete}
           onToggleComplete={onToggleComplete}
+          onView={onView}
           readOnly={readOnly}
         />
       ))}

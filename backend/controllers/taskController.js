@@ -4,11 +4,12 @@ const Task = require("../models/Task");
 // Create a new task
 exports.createTask = async (req, res) => {
   try {
-    const { title, description, priority, dueDate } = req.body;
+    const { title, description, subject, priority, dueDate } = req.body;
 
     const task = await Task.create({
       title,
       description,
+      subject,
       priority,
       dueDate,
       user: req.userId,
@@ -26,7 +27,7 @@ exports.createTask = async (req, res) => {
 // Get all tasks for the logged-in user, with optional search/filter
 exports.getTasks = async (req, res) => {
   try {
-    const { status, priority, search } = req.query;
+    const { status, priority, subject, search } = req.query;
 
     const query = { user: req.userId };
 
@@ -35,6 +36,10 @@ exports.getTasks = async (req, res) => {
 
     if (priority && priority !== "All") {
       query.priority = priority;
+    }
+
+    if (subject && subject !== "All") {
+      query.subject = subject;
     }
 
     if (search) {
@@ -76,7 +81,7 @@ exports.updateTask = async (req, res) => {
       return res.status(400).json({ message: "Invalid task ID" });
     }
 
-    const { title, description, priority, dueDate, completed } = req.body;
+    const { title, description, subject, priority, dueDate, completed } = req.body;
 
     const task = await Task.findOne({ _id: req.params.id, user: req.userId });
     if (!task) {
@@ -85,9 +90,13 @@ exports.updateTask = async (req, res) => {
 
     if (title !== undefined) task.title = title;
     if (description !== undefined) task.description = description;
+    if (subject !== undefined) task.subject = subject;
     if (priority !== undefined) task.priority = priority;
     if (dueDate !== undefined) task.dueDate = dueDate;
-    if (completed !== undefined) task.completed = completed;
+    if (completed !== undefined) {
+      task.completed = completed;
+      task.completedAt = completed ? new Date() : null;
+    }
 
     await task.save();
 

@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { SUBJECTS } = require("../constants");
 
 const taskSchema = new mongoose.Schema({
   title: {
@@ -10,6 +11,11 @@ const taskSchema = new mongoose.Schema({
     type: String,
     trim: true,
     default: "",
+  },
+  subject: {
+    type: String,
+    enum: SUBJECTS,
+    default: "Other",
   },
   priority: {
     type: String,
@@ -23,6 +29,10 @@ const taskSchema = new mongoose.Schema({
   completed: {
     type: Boolean,
     default: false,
+  },
+  completedAt: {
+    type: Date,
+    default: null,
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,

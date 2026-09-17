@@ -35,7 +35,7 @@ const Login = () => {
     <div className="auth-page">
       <form className="auth-form" onSubmit={handleSubmit}>
         <h1>Student Task Manager</h1>
-        <h2>Login</h2>
+        <h2>Welcome back</h2>
 
         {error && <p className="error-message">{error}</p>}
 
@@ -60,7 +60,7 @@ const Login = () => {
         </button>
 
         <p>
-          Don't have an account? <Link to="/register">Register</Link>
+          Don't have an account? <Link to="/register">Sign up</Link>
         </p>
       </form>
     </div>

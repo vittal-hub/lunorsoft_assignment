@@ -3,28 +3,28 @@ import { Link } from "react-router-dom";
 const features = [
   {
     title: "Create Tasks",
-    text: "Add your academic or personal tasks in seconds.",
+    text: "Add academic or personal tasks in seconds.",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path d="M12 5v14M5 12h14" strokeLinecap="round" />
       </svg>
     ),
   },
   {
-    title: "Set Priorities",
-    text: "Mark tasks as Low, Medium, or High priority.",
+    title: "Subject Organization",
+    text: "Organize tasks by subject or category.",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" strokeLinejoin="round" />
+        <path d="M15 4v5h5" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
+    title: "Priorities",
+    text: "Know which tasks need your attention first.",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <path
           d="M4 21V10M12 21V4M20 21v-7"
           strokeLinecap="round"
@@ -35,66 +35,30 @@ const features = [
   },
   {
     title: "Due Dates",
-    text: "Set a due date so you know what needs to be completed.",
+    text: "Keep track of upcoming deadlines.",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
         <rect x="3" y="5" width="18" height="16" rx="2" />
         <path d="M3 10h18M8 3v4M16 3v4" strokeLinecap="round" />
       </svg>
     ),
   },
   {
-    title: "Track Progress",
-    text: "See your pending and completed tasks in one place.",
+    title: "Today View",
+    text: "See what needs to be done today.",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path
-          d="M20 6 9 17l-5-5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" strokeLinecap="round" />
       </svg>
     ),
   },
   {
-    title: "Search & Filter",
-    text: "Quickly find the task you are looking for.",
+    title: "Progress",
+    text: "Track completed tasks and your productivity.",
     icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <circle cx="11" cy="11" r="7" />
-        <path d="m21 21-4.3-4.3" strokeLinecap="round" />
-      </svg>
-    ),
-  },
-  {
-    title: "Simple Dashboard",
-    text: "See your total, pending, and completed tasks at a glance.",
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <rect x="3" y="3" width="8" height="8" rx="1" />
-        <rect x="13" y="3" width="8" height="8" rx="1" />
-        <rect x="3" y="13" width="8" height="8" rx="1" />
-        <rect x="13" y="13" width="8" height="8" rx="1" />
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M20 6 9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -115,8 +79,8 @@ const Landing = () => {
       <header className="landing-hero">
         <h1>Manage Your Tasks. Stay Organized.</h1>
         <p>
-          Keep track of your academic and personal tasks, set priorities, add
-          due dates, and stay on top of your work.
+          Plan your academic and personal tasks, set priorities, track due
+          dates, and stay on top of your work.
         </p>
         <div className="landing-hero-buttons">
           <Link to="/register" className="btn-link btn-primary-link">
