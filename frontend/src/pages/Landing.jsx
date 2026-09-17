@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const features = [
   {
@@ -73,7 +74,58 @@ const steps = [
   },
 ];
 
+const aboutFeatures = [
+  { icon: "📝", title: "Create Tasks", text: "Add new academic or personal tasks in seconds." },
+  { icon: "✏️", title: "Edit Tasks", text: "Update a task's details whenever your plans change." },
+  { icon: "✅", title: "Mark Tasks as Completed", text: "Track your progress as you finish each task." },
+  { icon: "🗑️", title: "Delete Tasks", text: "Remove tasks you no longer need." },
+  { icon: "🔍", title: "Search Tasks", text: "Quickly find any task by its title or description." },
+  { icon: "🏷️", title: "Filter by Subject", text: "Organize tasks by subject or category." },
+  { icon: "⭐", title: "Task Priority", text: "Mark tasks as Low, Medium, or High priority." },
+  { icon: "📅", title: "Due Dates", text: "Keep track of upcoming deadlines." },
+  { icon: "📊", title: "Dashboard & Statistics", text: "See your total, pending, and completed tasks at a glance." },
+  { icon: "🔥", title: "Productivity Streak", text: "Stay motivated by tracking your daily completion streak." },
+  { icon: "🔐", title: "Secure Authentication", text: "Your account and tasks are kept private and secure." },
+];
+
+const LoggedInHome = () => (
+  <div className="landing">
+    <header className="landing-hero">
+      <h1>About Task Management</h1>
+      <p>
+        taskmangmt helps you create, organize, track, and complete your academic and personal
+        tasks — all in one simple, secure place.
+      </p>
+    </header>
+
+    <section className="landing-section">
+      <h2>Features</h2>
+      <div className="landing-features">
+        {aboutFeatures.map((feature) => (
+          <div className="landing-feature-card" key={feature.title}>
+            <div className="landing-feature-emoji">{feature.icon}</div>
+            <h3>{feature.title}</h3>
+            <p>{feature.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <footer className="landing-footer">
+      <p className="landing-footer-title">Student Task Manager</p>
+      <p>Simple task management for students.</p>
+      <p className="landing-footer-copy">© 2026 Student Task Manager</p>
+    </footer>
+  </div>
+);
+
 const Landing = () => {
+  const { user } = useAuth();
+
+  if (user) {
+    return <LoggedInHome />;
+  }
+
   return (
     <div className="landing">
       <header className="landing-hero">
