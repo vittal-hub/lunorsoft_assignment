@@ -91,75 +91,6 @@ Since the JWT lives in an HTTP-only cookie, client-side JavaScript can never rea
 
 Backend request bodies are validated with [Zod](https://zod.dev) before they reach any controller.
 
-```
-backend/
-├── validations/
-│   ├── authValidation.js   # registerSchema, loginSchema
-│   └── taskValidation.js   # createTaskSchema, updateTaskSchema
-└── middleware/
-    └── validate.js         # reusable middleware: validate(schema)
-```
-
-`validate.js` is a small factory function — it takes a Zod schema, runs `schema.safeParse(req.body)`, and either calls `next()` with the parsed data or responds with `400` and a list of field errors:
-
-```js
-const validate = (schema) => (req, res, next) => {
-  const result = schema.safeParse(req.body);
-  if (!result.success) {
-    const errors = result.error.issues.map((issue) => ({
-      field: issue.path.join("."),
-      message: issue.message,
-    }));
-    return res.status(400).json({ message: "Validation failed", errors });
-  }
-  req.body = result.data;
-  next();
-};
-```
-
-It's applied directly in the route definitions:
-
-```js
-router.post("/register", validate(registerSchema), register);
-router.post("/login", validate(loginSchema), login);
-
-router.route("/").post(validate(createTaskSchema), createTask);
-router.route("/:id").put(validate(updateTaskSchema), updateTask);
-```
-
-**Responsibility split** stays clean:
-- **Zod** — validates shape/format of incoming request data.
-- **Auth middleware** — checks whether the user is logged in.
-- **Controller** — application logic only (no manual `if (!title)` checks anymore).
-- **Mongoose** — schema-level database validation (a second safety net).
-
-`updateTaskSchema` is `createTaskSchema.partial()` — since a `PUT` may only send one changed field (e.g. `{ completed: true }` when toggling a task), every field is optional on update but still type/format-checked when present.
-
-Example invalid request:
-
-```bash
-curl -X POST http://localhost:5000/api/tasks \
-  -H "Content-Type: application/json" \
-  -d '{"title":"","priority":"Urgent","dueDate":"not-a-date"}'
-```
-
-Response (`400 Bad Request`):
-
-```json
-{
-  "message": "Validation failed",
-  "errors": [
-    { "field": "title", "message": "Title is required" },
-    { "field": "priority", "message": "Priority must be Low, Medium, or High" },
-    { "field": "dueDate", "message": "Due date must be a valid date" }
-  ]
-}
-```
-
-The frontend's `getErrorMessage()` helper (`frontend/src/services/api.js`) reads `err.response.data.errors` and joins the messages into one readable string shown in the form's error banner — no stack traces or internal details ever reach the UI.
-
----
-
 ## 8. Database Schema
 
 **User**
@@ -228,10 +159,7 @@ Copy the example files and fill in real values:
 
 ```bash
 cd backend
-cp .env.example .env   # then edit MONGO_URI and JWT_SECRET
-
 cd ../frontend
-cp .env.example .env   # defaults work for local dev
 ```
 
 ### Run the backend
@@ -271,7 +199,8 @@ Open `http://localhost:5173`, register a new account, and start managing tasks.
 
 ## 12. Screenshots
 
----
+<img width="1287" height="887" alt="image" src="https://github.com/user-attachments/assets/ecaaf5e2-31f9-44fd-8edb-8189bbd85e0d" />
+<img width="1247" height="853" alt="image" src="https://github.com/user-attachments/assets/6f2c24e8-91ac-4f7b-9ed1-b37dba72d980" />
 
 ## 13. Future Improvements
 
