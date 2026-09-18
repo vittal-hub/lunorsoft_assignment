@@ -1,3 +1,5 @@
+import { formatDeadline, isTaskOverdue } from "../utils/deadline";
+
 const CalendarIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="icon-calendar">
     <rect x="3" y="5" width="18" height="16" rx="2" />
@@ -6,7 +8,7 @@ const CalendarIcon = () => (
 );
 
 const TaskCard = ({ task, onEdit, onDelete, onToggleComplete, onView, readOnly }) => {
-  const isOverdue = !task.completed && new Date(task.dueDate) < new Date().setHours(0, 0, 0, 0);
+  const isOverdue = isTaskOverdue(task);
 
   // Action buttons sit inside the clickable card, so stop the click from also opening the overview
   const stopAndRun = (handler) => (e) => {
@@ -39,7 +41,7 @@ const TaskCard = ({ task, onEdit, onDelete, onToggleComplete, onView, readOnly }
         <div className="task-meta">
           <span className="task-due-date">
             <CalendarIcon />
-            Due {new Date(task.dueDate).toLocaleDateString()}
+            Due: {formatDeadline(task.dueDate)}
           </span>
           {isOverdue && <span className="overdue-tag">Overdue</span>}
         </div>

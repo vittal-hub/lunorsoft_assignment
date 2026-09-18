@@ -75,6 +75,11 @@ const steps = [
 ];
 
 const aboutFeatures = [
+  {
+    icon: "🎯",
+    title: "Smart Focus",
+    text: "Know what to work on next. Smart Focus automatically recommends the most important pending task based on priority, deadline, and how long it's been waiting.",
+  },
   { icon: "📝", title: "Create Tasks", text: "Add new academic or personal tasks in seconds." },
   { icon: "✏️", title: "Edit Tasks", text: "Update a task's details whenever your plans change." },
   { icon: "✅", title: "Mark Tasks as Completed", text: "Track your progress as you finish each task." },

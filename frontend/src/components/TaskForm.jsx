@@ -1,28 +1,33 @@
 import { useEffect, useState } from "react";
 import { SUBJECTS } from "../constants";
+import { combineDeadline, splitDeadlineForForm } from "../utils/deadline";
 
 const emptyForm = { title: "", description: "", subject: "Other", priority: "Medium", dueDate: "" };
 
 const TaskForm = ({ onSubmit, editingTask, onCancel, saving }) => {
   const [form, setForm] = useState(emptyForm);
   const [customSubject, setCustomSubject] = useState("");
+  const [deadlineTime, setDeadlineTime] = useState("");
   const [error, setError] = useState("");
 
   // Load existing task data into the form when editing
   useEffect(() => {
     if (editingTask) {
       const isCustomSubject = editingTask.subject && !SUBJECTS.includes(editingTask.subject);
+      const { date, time } = splitDeadlineForForm(editingTask.dueDate);
       setForm({
         title: editingTask.title,
         description: editingTask.description || "",
         subject: isCustomSubject ? "Other" : editingTask.subject || "Other",
         priority: editingTask.priority,
-        dueDate: editingTask.dueDate ? editingTask.dueDate.slice(0, 10) : "",
+        dueDate: date,
       });
       setCustomSubject(isCustomSubject ? editingTask.subject : "");
+      setDeadlineTime(time);
     } else {
       setForm(emptyForm);
       setCustomSubject("");
+      setDeadlineTime("");
     }
   }, [editingTask]);
 
@@ -65,9 +70,11 @@ const TaskForm = ({ onSubmit, editingTask, onCancel, saving }) => {
     }
 
     const subject = form.subject === "Other" ? customSubject.trim() : form.subject;
-    onSubmit({ ...form, subject });
+    const dueDate = combineDeadline(form.dueDate, deadlineTime);
+    onSubmit({ ...form, subject, dueDate });
     setForm(emptyForm);
     setCustomSubject("");
+    setDeadlineTime("");
   };
 
   return (
@@ -121,8 +128,22 @@ const TaskForm = ({ onSubmit, editingTask, onCancel, saving }) => {
         </div>
       </div>
 
-      <label>Due Date</label>
-      <input type="date" name="dueDate" value={form.dueDate} onChange={handleChange} />
+      <div className="task-form-row">
+        <div className="task-form-field">
+          <label>Due Date</label>
+          <input type="date" name="dueDate" value={form.dueDate} onChange={handleChange} />
+        </div>
+
+        <div className="task-form-field">
+          <label>Deadline Time (optional)</label>
+          <input
+            type="time"
+            name="deadlineTime"
+            value={deadlineTime}
+            onChange={(e) => setDeadlineTime(e.target.value)}
+          />
+        </div>
+      </div>
 
       <div className="task-form-buttons">
         <button type="submit" disabled={saving}>

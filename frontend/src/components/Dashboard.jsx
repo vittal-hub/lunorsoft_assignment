@@ -5,6 +5,7 @@ import { useTasks } from "../hooks/useTasks";
 import { updateTask, deleteTask } from "../services/taskService";
 import { getGreeting, isDueToday, calculateStreak } from "../utils/dashboard";
 import { getSmartFocusTask, formatDueLabel } from "../utils/smartFocus";
+import { hasDeadlineTime, formatTime12h } from "../utils/deadline";
 import TaskOverview from "./TaskOverview";
 
 const Dashboard = () => {
@@ -161,6 +162,9 @@ const Dashboard = () => {
                     {task.completed ? "✓" : ""}
                   </button>
                   <span className={task.completed ? "today-text-done" : ""}>{task.title}</span>
+                  {hasDeadlineTime(task.dueDate) && (
+                    <span className="today-item-time">{formatTime12h(new Date(task.dueDate))}</span>
+                  )}
                 </li>
               ))}
             </ul>

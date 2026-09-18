@@ -1,5 +1,7 @@
 // Simple rule-based "what should I do next" recommendation - no ML, just weighted scoring
 
+import { hasDeadlineTime, formatTime12h } from "./deadline";
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const startOfDay = (date) => {
@@ -10,6 +12,11 @@ const startOfDay = (date) => {
 
 const dueDateBucket = (dueDate) => {
   if (!dueDate) return "none";
+
+  // A task with an explicit time that has already passed is overdue right now,
+  // even if it's still "today" on the calendar - the exact deadline matters.
+  if (hasDeadlineTime(dueDate) && new Date(dueDate) < new Date()) return "overdue";
+
   const diffDays = Math.round((startOfDay(dueDate) - startOfDay(new Date())) / DAY_MS);
 
   if (diffDays < 0) return "overdue";
@@ -61,15 +68,21 @@ const buildReason = (task, bucket) => {
 // Human-friendly due date label used by the Smart Focus card
 export const formatDueLabel = (dueDate) => {
   if (!dueDate) return "No due date";
+
+  const withTime = hasDeadlineTime(dueDate);
+  const timeSuffix = withTime ? `, ${formatTime12h(new Date(dueDate))}` : "";
   const bucket = dueDateBucket(dueDate);
-  if (bucket === "today") return "Today";
-  if (bucket === "tomorrow") return "Tomorrow";
+
+  const diffDays = Math.round((startOfDay(dueDate) - startOfDay(new Date())) / DAY_MS);
+  if (diffDays === 0) return bucket === "overdue" ? `Today${timeSuffix} (overdue)` : `Today${timeSuffix}`;
+  if (diffDays === 1) return `Tomorrow${timeSuffix}`;
+
   const label = new Date(dueDate).toLocaleDateString(undefined, {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
-  return bucket === "overdue" ? `${label} (overdue)` : label;
+  return bucket === "overdue" ? `${label}${timeSuffix} (overdue)` : `${label}${timeSuffix}`;
 };
 
 // Picks the single pending task most worth focusing on next, or null if none are pending

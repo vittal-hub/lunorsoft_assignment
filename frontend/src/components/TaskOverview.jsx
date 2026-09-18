@@ -1,3 +1,5 @@
+import { formatDeadline, isTaskOverdue } from "../utils/deadline";
+
 const formatDate = (value) =>
   value
     ? new Date(value).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })
@@ -6,7 +8,7 @@ const formatDate = (value) =>
 const TaskOverview = ({ task, onClose, onEdit, onDelete, onToggleComplete }) => {
   if (!task) return null;
 
-  const isOverdue = !task.completed && new Date(task.dueDate) < new Date().setHours(0, 0, 0, 0);
+  const isOverdue = isTaskOverdue(task);
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -41,7 +43,7 @@ const TaskOverview = ({ task, onClose, onEdit, onDelete, onToggleComplete }) => 
 
           <div className="modal-row">
             <span className="modal-label">Due date</span>
-            <span>{formatDate(task.dueDate)}</span>
+            <span>{formatDeadline(task.dueDate)}</span>
           </div>
 
           {task.description && (
